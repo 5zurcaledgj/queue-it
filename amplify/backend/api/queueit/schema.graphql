@@ -1,0 +1,44 @@
+type Element @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String
+  phone: AWSPhone
+  email: AWSEmail
+  positiion: Int
+  link: String
+  queueID: ID! @index(name: "byQueue")
+}
+
+enum QueueStatus {
+  ACTIVE
+  CLOSED
+}
+
+enum Status {
+  ACTIVE
+  DISABLED
+}
+
+type Queue @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String
+  status: QueueStatus
+  companyID: ID! @index(name: "byCompany")
+  Elements: [Element] @hasMany(indexName: "byQueue", fields: ["id"])
+}
+
+type Admin @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String
+  email: AWSEmail
+  companyID: ID! @index(name: "byCompany")
+  status: Status
+}
+
+type Company @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String
+  Queues: [Queue] @hasMany(indexName: "byCompany", fields: ["id"])
+  Admins: [Admin] @hasMany(indexName: "byCompany", fields: ["id"])
+  status: Status
+}
+ 
